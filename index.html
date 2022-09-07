@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html>
+<head>
+     <link rel="icon" type="image/png" href="icon.png"><!-- sizes="32x32" -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' http://* 'unsafe-inline'; script-src 'self' http://* 'unsafe-inline' 'unsafe-eval'" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <title>QuickNote</title>
+    <!-- Script and Style -->
+    <!-- <style src="/html/res/normalize.min.css"></style> -->
+    <!-- <style src="/html/res/ionicons.min.css"></style> -->
+    
+    <!-- JQuery -->
+    <!-- <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
+    <script src="https://clouds.nos-eastchina1.126.net/jquery.min.js"></script>
+    <!-- <script src="https://clouds.nos-eastchina1.126.net/aes.min.js"></script> -->
+
+    <!-- Ionicons -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/ionicons/6.0.3/ionicons/ionicons.esm.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/ionicons/6.0.3/ionicons/ionicons.min.js"></script>
+
+    <!-- Blueimp-md5 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
+</head>
+<style>
+    html {
+        font-size: 16px;
+        overflow-x: hidden;
+    }
+    body {
+        font-size: 1rem;
+        background-color: #f1f1f2;
+        overflow-x: hidden;
+    }
+    button {
+        background-color: transparent;
+        color: #444;
+        outline: none;
+        font-size: 1rem;
+        border: 1px solid #444;
+        cursor: pointer;
+        padding: .4rem .8rem;
+    }
+    button:hover {
+        border-color: #02A3FB;
+        color: #02A3FB;
+        outline: none;
+    }
+    button:active {
+        opacity: .5;
+        outline: none;
+    }
+    .container-sm {
+        position: relative;
+        max-width: 550px;
+        margin: 10px auto 10px auto;
+        /*border: 3px solid #71B7E6;*/
+        border-radius: 8px;
+    }
+    .addItemBtn {
+        position: absolute;
+        font-size: 1.6rem;
+        cursor: pointer;
+        top: 0;
+        /*bottom: 0;*/
+        right: -2.4rem;
+        outline: none;
+        border: none;
+        background-color: transparent;
+        color: #999;
+    }
+    input,textarea {
+        background-color: #fff;
+        border: 1px solid transparent;
+        border-bottom: 1px solid #555;
+        padding: 0.3rem 0;
+        outline: none;
+        font-size: 1rem;
+        /* 模范 google */
+/*        border-bottom-left-radius: .5rem;
+        border-bottom-right-radius: .5rem;*/
+    }
+    input:hover,
+    textarea:hover,
+    input:focus,
+    textarea:focus {
+        border-bottom-color: #02A3FB;
+    }
+    button[disabled],
+    input[disabled],
+    textarea[disabled],
+    button[disabled]:hover,
+    button[disabled]:focus,
+    button[disabled]:active,
+    input[disabled]:hover,
+    input[disabled]:active,
+    textarea[disabled]:hover,
+    input[disabled]:focus,
+    textarea[disabled]:active,
+    textarea[disabled]:focus {
+        cursor: inherit;
+        color: #999;
+        border-color: #999;
+        opacity: 1
+    }
+    .findContent,
+    .findContent:focus {
+        width: 100%;
+        font-size: 1.6rem;
+        text-align: center;
+        overflow: hidden;
+    }
+    .topSearchBar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 500;
+        background-color: #f1f1f2;
+
+    }
+    .topSearchBar .tuijian {
+        margin-top: .2rem;
+        font-size: .7rem;
+        text-align: center;
+    }
+    .topSearchBar .tuijian a {
+        color: #999;
+    }
+    .topSearchBar>.container {
+        /*box-shadow: 0 3px 12px rgb(98 107 181 / 25%);*/
+        /*border-bottom: 1px solid #555;*/
+    }
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .qkweb-content .item {
+        position: relative;
+        background-color: #fff;
+        padding: .5rem;
+        border: 1px solid #d0d0d0;
+        margin-bottom: 0.95rem;
+        border-radius: 0.28rem;
+        min-height: 2.8rem;
+        word-break : normal;
+    }
+
+    .qkweb-content .item img {
+        max-width: 100%
+    }
+    .qkweb-content .item .operItemModal {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(255,255,255, .8);
+        text-align: center;
+        z-index: 1000;
+    }
+    .qkweb-content .item .operItemModal .btns {
+        margin: 0 auto
+    }
+    .qkweb-content .item .operItemModal .btns button {
+        border: none;
+        font-size: 1.5rem;
+        background-color: #eee;
+        border-radius: 50%
+    }
+    .qkweb-content .item .item2 .k {
+        /*display: none;*/
+        /*background-color: #f6f6f6;*/
+        /*border-radius: 4px;*/
+        color: #999;
+        margin-right: 0.26rem;
+        /*padding: 4px;*/
+    }
+    .qkweb-content .item>.item2 {
+        /*width: 70%;*/
+    }
+    .qkweb-content .item>.item2.rough-time {
+        color: #999;
+        font-size: .8rem;
+        margin-bottom: .5rem;
+    }
+    .qkweb-content .item .item2 .k,
+    .qkweb-content .item .item2 .v {
+        word-wrap:break-word;
+        word-break:normal;
+    }
+    .qkweb-content .item .item2.name .k,
+    .qkweb-content .item .item2.content .k {
+        display: none;
+    }
+    .qkweb-content .item .item2.content {
+        /*margin-bottom: 10px;*/
+        /*background-color: #eee*/
+    }
+
+    .qkweb-content .item .item2.name .v {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+    .qkweb-content .item .item2.name.noName .v {
+        color: #ddd;
+    }
+
+    .qkweb-content .item .item2.url .v {
+/*        overflow: hidden;
+        text-overflow:ellipsis;
+        white-space: nowrap;*/
+    }
+
+
+    a,.a {
+        color: #39C;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    a:hover,.a:hover {
+        color: #005e93;
+        /*text-decoration: underline;*/
+    }
+    a.tag {
+        margin-right: 0.4rem;
+    }
+    a.tag:hover {
+        color: #02A3FB;
+        /*background-color: #39C;*/
+    }
+    .hide,.hide1 {
+        display: none;
+    }
+    .floatContainer {
+        opacity: 0;
+        position: absolute;
+        top: .5rem;
+        right: .5rem;
+        z-index: 999;
+        transition: .2s;
+        text-align: center;
+        background: #fff;
+        z-index: 999;
+        font-size: 1.5rem;
+    }
+    .qkweb-content .item:hover .floatContainer,
+    .qkweb-content .item .floatContainer:hover {
+        opacity: 1;
+    }
+    .floatContainer .k {
+        border-radius: 4px;
+    }
+
+    .floatContainer a {
+        color: #999;
+    }
+    .floatContainer a:hover {
+        color: #000;
+    }
+
+
+    ::-webkit-scrollbar-track {
+        background-color: transparent;
+
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: rgba(0,0,0,.15);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(0,0,0,.4);
+        cursor: pointer;
+    }
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+        background-color: transparent;
+    }
+
+    .qkmodal-box {
+        display: flex;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0,0,0,.2);
+        align-items: center;
+        z-index: 2000;
+        overflow: auto;
+    }
+    .qkmodal-box .qkmodal {
+        display: inline-block;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 1rem;
+        max-height: 100%;
+        max-width: 100%;
+    }
+    .qkmodal-box .qkmodal .qkmodal-foot {
+        text-align: center;
+        margin-top: 1rem;
+    }
+    .qkmodal-box .qkmodal .item {
+        display: flex;
+        margin-bottom: 1rem;
+    }
+    .qkmodal-box .qkmodal .item .k {
+        position: relative;
+        display: inline-block;
+        width: 6rem;
+        margin-right: 1rem;
+    }
+    .qkmodal-box .qkmodal .item .k .float {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+    .qkmodal-box .qkmodal .item .v {
+        display: inline-block;
+    }
+    .qkmodal-box .qkmodal .item input {
+        width: 100%
+    }
+    .qkmodal-box .qkmodal .item textarea {
+        display: inline-block;
+        width: 36rem;
+        padding: 0;
+    }
+    .qkmodal-box.checkImg {
+        background-color: rgba(0,0,0,.7)
+    }
+    .qkmodal-box.checkImg .qkmodal {
+        padding: 0;
+        background-color: transparent;
+    }
+
+    .qkmodal-box.checkImg .qkmodal-head {
+        display: none;
+    }
+    .qkmodal-box.checkImg .qkmodal-foot button {
+        background-color: #000;
+        color: #fff;
+        padding: .5rem 1rem;
+        border-radius: 50%;
+    }
+    .qkmodal-box.checkImg .qkmodal-body img {
+
+    }
+
+    .content-url {
+        font-size: .8rem;
+    }
+
+
+
+    @media only screen and (max-width: 1200px) {
+        html {
+            /*font-size: 20px;*/
+            /*background-color: #000;*/
+        }
+        body {
+            margin: 0;
+        }
+        body {
+            user-select: none;
+        }
+        input,
+        textarea,
+        .qkweb-content .item .v {
+            user-select: auto;
+        }
+        .container,
+        .container-sm,
+        .qkweb-content {
+            width: 100%;
+            margin: 0;
+        }
+        
+        .qkmodal-box .qkmodal {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+        }
+        .qkmodal-box .qkmodal .item {
+            display: block;
+            margin-bottom: .4rem;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: .4rem
+        }
+        .qkmodal-box .qkmodal {
+            /*background-color: rgba(255,255,255,.6);*/
+        }
+        .qkmodal-box .qkmodal .item .k .float {
+
+            position: relative;
+
+        }
+        .qkmodal-box .qkmodal .item .k {
+            display: block;
+            color: #666
+        }
+        .qkmodal-box .qkmodal .item input,
+        .qkmodal-box .qkmodal .item textarea {
+            width: 100%;
+        }
+        .qkmodal-box .qkmodal .item textarea {
+            height: 12rem;
+        }
+        .qkmodal-box .qkmodal .qkmodal-foot>button {
+            display: block;
+            margin-right: 0;
+            width: 100%;
+            margin-bottom: .2rem;
+        }
+        .addItemBtn {
+            margin-right: 1.8rem;
+            width: 3.2rem;
+        }
+        button {
+            font-size: 1rem;
+        }
+    } 
+    /*Typing Loader*/
+    .typing_loader{
+        position: absolute;
+        top: 1.1rem;
+        left: .2rem;
+        width: .4rem;
+        height: .4rem;
+        border-radius: 50%;
+        -webkit-animation: typing 1s linear infinite alternate;
+           -moz-animation: Typing 1s linear infinite alternate;
+                animation: typing 1s linear infinite alternate;
+    }
+    @-webkit-keyframes typing{
+        0%{
+            box-shadow: 12px 0px 0px 0px rgba(0,0,0,0.2), 
+                        24px 0px 0px 0px rgba(0,0,0,0.2);
+          }
+        25%{ 
+            box-shadow: 12px 0px 0px 0px rgba(0,0,0,2), 
+                        24px 0px 0px 0px rgba(0,0,0,0.2);
+        }
+        75%{ 
+            box-shadow: 12px 0px 0px 0px rgba(0,0,0,0.2), 
+                        24px 0px 0px 0px rgba(0,0,0,1);
+          }
+    }
+
+    @-moz-keyframes typing{
+       0%{
+            background-color: rgba(255,255,255, 1);
+            box-shadow: 12px 0px 0px 0px rgba(255,255,255,0.2), 
+                        24px 0px 0px 0px rgba(255,255,255,0.2);
+          }
+        25%{ 
+            background-color: rgba(255,255,255, 0.4);
+            box-shadow: 12px 0px 0px 0px rgba(255,255,255,2), 
+                        24px 0px 0px 0px rgba(255,255,255,0.2);
+        }
+        75%{ background-color: rgba(255,255,255, 0.4);
+            box-shadow: 12px 0px 0px 0px rgba(255,255,255,0.2), 
+                        24px 0px 0px 0px rgba(255,255,255,1);
+          }
+    }
+
+    @keyframes typing{
+       0%{
+            box-shadow: 12px 0px 0px 0px rgba(0,0,0,0.2), 
+                        24px 0px 0px 0px rgba(0,0,0,0.2);
+          }
+        25%{ 
+            box-shadow: 12px 0px 0px 0px rgba(0,0,0,2), 
+                        24px 0px 0px 0px rgba(0,0,0,0.2);
+        }
+        75%{ 
+            box-shadow: 12px 0px 0px 0px rgba(0,0,0,0.2), 
+                        24px 0px 0px 0px rgba(0,0,0,1);
+          }
+    }
+
+    .czjz {
+        display: flex;
+        align-items: center;
+    }
+    .czjz-inline {
+        display: flex-inline;
+        align-items: center;
+    }
+
+    .data-backups-box {
+        border: 1px solid #222;
+        padding: .5rem;
+    }
+</style>
+<body>
+    <div class="topSearchBar">
+        <div class="container">
+            <div class="container-sm">
+                <input type="text" class="findContent" placeholder="Start here!">
+                <button class="addItemBtn">+</button>
+                <div class="typing_loader loading-icon" style="display:none"></div>
+                <div class="tuijian" >
+                    <a href="javascript:;" data-search="#系统化#">系统化</a>&nbsp;&nbsp;
+                    <!-- <a href="javascript:;" data-search="#pixivImg#">#p站美图#</a> -->
+                    <a href="javascript:;" data-search="1">搜索全部</a>&nbsp;&nbsp;
+                    <a href="javascript:;" data-search="@回收站@">回收站</a>&nbsp;&nbsp;
+                    <a href="javascript:;" class="tuijianbtn-data-backups">数据备份</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="qkweb-content container" style="margin-top: 5rem"></div>
+<!--     <div class="qkmodal-box" style="display:none" data-id=0>
+        <div class="qkmodal">
+            <div class="qkmodal-head">
+                
+            </div>
+            <div class="qkmodal-body">
+                
+            </div>
+            <div class="qkmodal-foot">
+                <button class="btn">保持</button>
+                <button class="btn qkmodal-close">取消</button>
+            </div>
+        </div>
+    </div> -->
+<script>
+( () => {
+    function hongen(str) {
+        str = str.replace(/\'/g, 'f6E1')
+        str = str.replace(/\"/g, '{*1}')
+        str = str.replace(/\;/g, '{*2}')
+        str = str.replace(/\\/g, '{*3}')
+        str = str.replace(/\{/g, '{*4}')
+        str = str.replace(/\}/g, '{*5}')
+        str = str.replace(/\[/g, '{*6}')
+        str = str.replace(/\]/g, '{*7}')
+        return str
+    }
+    function hongun(str) {
+        str = str.replace(/{\*0}/g, '\'')
+        str = str.replace(/{\*1}/g, '\"')
+        str = str.replace(/{\*2}/g, '\;')
+        str = str.replace(/{\*3}/g, '\\')
+        str = str.replace(/{\*4}/g, '\{')
+        str = str.replace(/{\*5}/g, '\}')
+        str = str.replace(/{\*6}/g, '\[')
+        str = str.replace(/{\*7}/g, '\]')
+        return str
+    }
+
+    function showModal(funName, head, body, foot) {
+        $('body').append(`    <div class="qkmodal-box ${funName}" style="display:none" data-fun=${funName}>
+        <div class="qkmodal">
+            <div class="qkmodal-head">
+                Modal-head
+            </div>
+            <div class="qkmodal-body">
+                Modal-body
+            </div>
+            <div class="qkmodal-foot">
+                <button class="btn">确定</button>
+                <button class="btn qkmodal-close">取消</button>
+            </div>
+        </div>
+    </div>`)
+        $('.qkmodal-box[data-fun='+funName+'] .qkmodal .qkmodal-head').html(head)
+        $('.qkmodal-box[data-fun='+funName+'] .qkmodal .qkmodal-body').html(body)
+        $('.qkmodal-box[data-fun='+funName+'] .qkmodal .qkmodal-foot').html(foot)
+        $('.qkmodal-box[data-fun='+funName+']').show()
+    }
+    function closeModal(funName) {
+        $('.qkmodal-box[data-fun='+funName+']').remove()
+    }
+    function getModalOper(funName, tagName, no) {
+        return $(`.qkmodal-box[data-fun=${funName}] ${tagName}.oper.no-${no}`)
+    }
+    function regModalOperEvent(funName, tagName, no, event, fun) {
+        $(`.qkmodal-box[data-fun=${funName}] ${tagName}.oper.no-${no}`).on('click', (e) => {
+            var d = $(this)
+            fun(d)
+        })
+    }
+    $(document).on('click', `.qkmodal-close`, function(r) {
+        var closeFun = (dom) => {
+            if ($(dom).hasClass('qkmodal-box')) {
+                $(dom).remove()
+            } else {
+                closeFun($(dom).parent())
+            }
+        }
+        closeFun($(this))
+    })
+
+
+    //验证
+    var parm = [0, 0]
+    if (typeof localStorage.accessMsg == 'undefined') {
+        showModal('accessIf', '设置令牌', `
+            <div>当前没有可通过验证的令牌，请设置。</div>
+        <input type="password" class="oper no-1" placeholder="V1" />
+        <input type="password" class="oper no-2" placeholder="V2" />
+            `, `
+        <button class="btn oper no-1">确定</button>
+
+            `)
+        regModalOperEvent('accessIf', 'button', 1, 'click', (dom) => {
+            let o = getModalOper('accessIf', 'button', 1),
+                v1 = getModalOper('accessIf', 'input', 1),
+                v2 = getModalOper('accessIf', 'input', 2);
+            if (!v1.val()) {
+                return v1.focus()
+            }
+
+            if (!v2.val()) {
+                return v2.focus()
+            }
+
+            parm = v1.val() + ',' + v2.val()
+            closeModal('accessIf')
+
+        })
+    } else {
+        parm = localStorage.accessMsg
+    }
+
+
+
+    function ajax(fun, data={}, sfn, efn = function(){}) {
+        data.token = parm
+        $.ajax({
+            'type': 'POST',
+            'url': 'https://main-quicknote-clzadyabno.cn-shenzhen.fcapp.run/api/' + fun,
+            'data': data,
+            'cache': false,
+            'dataType': 'html',
+            // 'contentType': false,
+            'async' : true,
+            success : function (data) {
+                var ddddd = JSON.parse(data)
+                if (ddddd.code == 0) {
+                    sfn(ddddd)
+                } else {
+                    efn()
+                    showModal('ajaxError', '信息', ddddd.msg, '<button class="btn qkmodal-close">确定</button>')
+                }
+                
+            },
+            error : function (e) {
+                efn()
+                showModal('netError', '网络出错，请重试。', ddddd.msg, '<button class="btn qkmodal-close">确定</button>')
+            }
+        });
+    }
+
+    $('.findContent').focus()
+
+
+
+
+    var resData = [], //本次搜索结果
+        resData_fromIdGetItemData = {}, //记录当前结果k为id，v为resData的index
+        preLoadSearchRes = {}, //预搜索合集
+        preLoadTimeInfo = {
+            all: 0,
+            save: 0,
+            percentage: 0
+        }
+
+    //获取搜索结果并保存
+    var getSearchRes = () => {
+        var preLoadSearchRes_key = escape($('.findContent').val())
+        var beforeAjax_findContent = $('.findContent').val()
+
+        if (beforeAjax_findContent == '') return
+
+        ajax('search', {
+            content: escape(beforeAjax_findContent)
+        }, function(d) {
+            if (beforeAjax_findContent !== $('.findContent').val()) return
+            d.data = JSON.parse(d.data)
+            for (var i=0;i<d.data.length;i++) {
+                for (let k in d.data[i]) {
+                    if (k.indexOf('tag') >= 0) {
+                        d.data[i][k] = unescape(d.data[i][k].join('%20')).split(' ')
+                    } else if (typeof d.data[i][k] == 'string') {
+                        d.data[i][k] = unescape(d.data[i][k])
+                    }
+                }
+            }
+
+            preLoadSearchRes[preLoadSearchRes_key] = d.data
+
+            if (searchState == 'waitRes' && beforeAjax_findContent == $('.findContent').val()) {
+                search()
+            }
+        })
+    }
+
+    var searchState = 'normal',
+        nowShowSearch = '';
+    function search(isPreSearch = false) {
+        var preLoadSearchRes_key = escape($('.findContent').val())
+
+        if ($('.findContent').val() == '' || nowShowSearch == $('.findContent').val()) return
+
+        // $('.qkweb-content').html('查询中...')
+        $('.loading-icon').fadeIn(100)
+
+        if (typeof preLoadSearchRes[preLoadSearchRes_key] !== 'undefined') {
+            resData = preLoadSearchRes[preLoadSearchRes_key]
+
+            $('.loading-icon').fadeOut(100)
+            $('.qkweb-content').html('')
+            $('.qkweb-content').append('<hr>')
+
+            //搜索耗时（被关闭
+            $('.qkweb-content').append('<div class="resCount">共 '+resData.length+' 条结果</div>')
+            // $('.qkweb-content').append('<div class="t1">数据库查询耗时 '+d.time1+' ms</div>')
+            // $('.qkweb-content').append('<div class="t2">数据包装耗时 '+d.time2+' ms</div>')
+            // $('.qkweb-content').append('<div class="t0">数据文件读取耗时 '+d.time0+' ms</div>')
+
+            // 制作者展示
+            $('.qkweb-content').append('<div class="">Powered By Hong @2021-2022</div>')
+
+            searchState = 'normal'
+            nowShowSearch = $('.findContent').val()
+
+            if (resData.length <= 0) {
+                $('.qkweb-content').html('没有相关记录。')
+            } else {
+                nowShowItemsStart = 0
+                showNextItems()
+            }
+
+        } else {
+            searchState = 'waitRes'
+        }
+    }
+
+
+    //回车搜索
+    var preLoad_beforeFindContent = ''
+    $('.findContent').on('keyup', function(e) {
+        if (e.keyCode == 13) {
+            search()
+        } else {
+            //实时预读内容
+            if (preLoad_beforeFindContent !== $('.findContent').val()) {
+                getSearchRes()
+            }
+        }
+
+        preLoad_beforeFindContent = $('.findContent').val()
+    })
+
+    $(document).on('mouseup', '*', function(e) {
+        //实时预读内容
+        if (preLoad_beforeFindContent !== $('.findContent').val()) {
+            getSearchRes()
+        }
+        preLoad_beforeFindContent = $('.findContent').val()
+    })
+
+
+
+    //获取焦点和失去焦点
+    var findContentFocusAndBlur = $('.findContent').val()
+    $('.findContent').focus(() => {
+        findContentFocusAndBlur = $('.findContent').val()
+    })
+    $('.findContent').blur(() => {
+        if ($('.findContent').val() !== findContentFocusAndBlur) {
+            search()
+        }
+    })
+
+    var richItemContent = function(str){
+        var re = /(f|ht){1}(tp|tps):\/\/([\w-]+\.)+[\w-]+(\/[\w- ./?%&=]*)?/g; 
+
+        str = str.replace(re, function(website){
+            return `<a class="content-url" href="${website}" target="_blank"><ion-icon name="link-sharp"></ion-icon> ${website}</a>`; 
+        });
+
+
+        str = str.replace(/(\[\[\$search\&nbsp\;)(.*)(\]\])/g, function(t) {
+            
+            t = t.substring( ('[[$search&nbsp;').length )
+            t = t.substr(0, t.length - 2)
+            return ` <a class="contentCommand-search" href="javascript:;" data-search="${t}"><ion-icon name="search-outline"></ion-icon>${t}</a>`;
+        });
+
+
+        return str;
+    };
+
+    function timeToRough(t) { //t单位为s
+        t = Number(t)
+        var nowT = Number(new Date())/1000,
+            distance = nowT - t
+
+        if (distance < 60) {
+            return '刚刚'
+        } else if (distance >= 60 && distance < 3600) {
+            return parseInt(distance/60) + ' 分钟前'
+        } else if (distance >= 3600 && distance < 24*3600) {
+            return parseInt(distance/3600) + ' 小时前'
+        } else if (distance >= 24*3600 && distance < 31*24*3600) {
+            return parseInt(distance/(24*3600)) + ' 天前'
+        } else if (distance >= 31*24*3600 && distance < 12*31*24*3600) {
+            return parseInt(distance/(31*24*3600)) + ' 个月前'
+        } else {
+            return parseInt(distance/(12*31*24*3600)) + ' 年前'
+        }
+
+    }
+
+    var nowShowItemsStart = 0
+    function showNextItems() {
+        for (var i = nowShowItemsStart; i < nowShowItemsStart + 9; i++) {
+            if (i >= resData.length) break;
+            let  h = '',
+                 item_add = '';
+            let floatContainerContent = ''
+            if (resData[i].type == 2) {
+                showPageInfo = 1
+            } else {
+                showPageInfo = 0
+            }
+
+            resData_fromIdGetItemData[resData[i].id] = i
+
+            //添加时间
+            h += '<div class="item2 rough-time tagMaps czjz">' + timeToRough(Number(resData[i].time)/1000)
+            h += '&nbsp;&nbsp;'
+
+            //添加标签
+            if (resData[i].tag.length > 0) {
+                for (let tagMaps_k in resData[i].tag) {
+                    let tagMaps_un = unescape(resData[i].tag[tagMaps_k])
+                    if (!tagMaps_un) continue;
+                    h += '<a href="javascript:;" data-search="#'+tagMaps_un+'#" class="tag">#'+tagMaps_un+'#</a>'
+                }
+            }
+
+
+            h += '</div>'
+
+            Object.keys(resData[i]).forEach(function(k) {
+
+
+                if (k == 'content') {
+                    if (typeof resData[i].isCodeMode !== 'undefined') {
+                        var v = resData[i][k]
+                    } else {
+                        var v = resData[i][k].replace(/\n/g, '<br>').replace(/ /g, '&nbsp;')
+                        v = richItemContent(v)
+                    }
+                } else {
+                    if (typeof resData[i][k] == 'string') {
+                        var v = resData[i][k].replace(/\n/g, '<br>').replace(/ /g, '&nbsp;')
+                    } else {
+                        var v = resData[i][k]
+                    }
+                }
+                
+                var k_add = '',
+                    k_show = k,
+                    isContainerContentItem = false;
+
+                
+
+                if (k == 'name' && v == '') {
+                    k_add = ' noName hide1'
+                    v = '#无名称'
+                }
+
+
+                if (k == 'content') {
+                    if (resData[i].type == 2) {
+                        k_add += ' hide1'
+                    }
+                    
+                }
+
+                if (k == 'content' && typeof resData[i].filePath !== 'undefined') {
+                    v += '<br><img src="' + resData[i].filePath.replace('syn/resources/pixivImg', 'https://live.nos-eastchina1.126.net/pimg') + '" alt="alt">'
+                }
+
+                // if (k == 'tag') {
+                //     // k_show = '标签';
+                //     // isContainerContentItem = true;
+
+                //     // if (v.indexOf('网页收藏') >= 0) {
+
+                //     // }
+                // }
+
+                if (k.indexOf('tag') >= 0 || k.indexOf('Tag') >= 0 ) {
+                    //s1:区分真实标签和假标签
+                    if (k == 'tag') {
+                        var s1 = '#'
+                    } else {
+                        var s1 = ''
+                    }
+
+                    let allTagHtml = ''
+                    for (var i2=0;i2<v.length;i2++) {
+                        v[i2] = unescape(v[i2])
+                        allTagHtml += '<a href="javascript:;" data-search="'+s1+v[i2]+s1+'" class="tag">'+v[i2]+'</a>'
+                    }
+                    v = allTagHtml
+                }
+
+
+                //显示在幅度框的时间
+                if (k == 'time') {
+                    k_add += ' hide1';
+                    // k_show = '时间';
+                    // var t = new Date(Number(v));
+                    // v = t.getFullYear()+'年'+(t.getMonth()+1)+'月'+t.getDate()+'日';
+                    // v += ' ' + t.getHours() + ':' + t.getMinutes(); //+ ':' + v.getSeconds()
+                    // isContainerContentItem = true;
+                }
+
+                if (k == 'pageTitle') {
+                    k_show = '网页标题'
+                }
+
+                if (k == 'pageUrl') {
+                    k_show = '网页地址'
+                    v = '<a href="'+v+'" target="_blank">'+v+'</a>'
+                }
+
+                if (k == 'pageTag') {
+                    k_show = '网页标签'
+                    k_add += ' hide'
+                }
+
+                //若k为id/type/filePath则绝对隐藏
+                if (k === 'id' || k === 'type' || k === 'filePath' || k== 'pageFavIconUrl') {
+                    k_add += ' hide1';
+                }
+
+                if (k == 'tag') {
+                    k_add += ' hide1';
+                }
+
+                if (k.indexOf('page') >= 0 && !showPageInfo) k_add += ' hide';
+
+
+                if (isContainerContentItem) {
+                    floatContainerContent += `<div class="item2 ${k} ${k_add}"><span class="k">${k_show}</span><span class="v">${v}</span></div>`
+                } else {
+                    h += `<div class="item2 ${k} ${k_add}"><span class="k">${k_show}</span><span class="v">${v}</span></div>`
+                }
+            })
+
+            if (!showPageInfo) {
+                floatContainerContent += '<span style="margin-right:10px" class="a showPageMsg"><ion-icon name="document-outline"></ion-icon></span>'
+            }
+
+            floatContainerContent += '<span class="a operItem"><ion-icon name="ellipsis-vertical-outline"></ion-icon></span>'
+
+            $('.qkweb-content hr').before(`<div style="display:none" data-id="${resData[i].id}" class="item ${item_add}">${h}<div class="floatContainer">${floatContainerContent}</div></div>`)
+
+            var checkHeightItemDOM = $(`.qkweb-content .item[data-id=${resData[i].id}]`)
+            if (checkHeightItemDOM.height() > 400) {
+                checkHeightItemDOM.css('max-height', 400)
+                checkHeightItemDOM.css('overflow', 'auto')
+            }
+
+
+            
+
+            
+
+            checkHeightItemDOM.show()
+
+            checkHeightItemDOM.css('min-height', $(checkHeightItemDOM.find('.floatContainer')).height())
+
+
+        }
+
+        
+        if (i < resData.length) {
+            $('.qkweb-content hr').before('<button class="moreItemsBtn"><ion-icon name="ellipsis-horizontal-outline"></ion-icon></button> ')
+        }
+        
+
+        nowShowItemsStart = i
+    }
+
+    //滚动加载
+    $(window).scroll(function(){
+        if ($(document).scrollTop() >= $(window).scrollTop() - 50) {
+            // showNextItems()
+        } else {
+
+        }
+    })
+
+
+    $('.addItemBtn').on('click', function(e) {
+        if ($('.qkweb-content .addNote').length <= 0) {
+            $('.qkweb-content').html('<div class="addNote"><div><input placeholder="名称" style="width:100%" type="text" class="addNote-name"></div><div><textarea placeholder="内容" style="width:100%" rows="16" class="addNote-content"></textarea></div><div><input placeholder="标签（用空格分开每个标签）" style="width:100%" class="addNote-tag"></div><p><button class="addNote-yesBtn">添加</button></p></div>')
+
+            if (typeof localStorage.addNote_pageVer_content !== 'undefined') {
+                $('.addNote-content').val(localStorage.addNote_pageVer_content)
+            }
+
+            if (typeof localStorage.addNote_pageVer_name !== 'undefined') {
+                $('.addNote-name').val(localStorage.addNote_pageVer_name)
+            }
+
+            if (typeof localStorage.addNote_pageVer_tag !== 'undefined') {
+                $('.addNote-tag').val(localStorage.addNote_pageVer_tag)
+            }
+
+
+            $('.addNote-content').focus()
+
+        }
+    })
+
+    //自动保存到本地
+    $(document).on('keyup', '.addNote-content', function(e) {
+        if (localStorage.addNote_pageVer_content !== $('.addNote-content').val()) {
+            localStorage.addNote_pageVer_content = $('.addNote-content').val()
+        }
+    })
+    $(document).on('keyup', '.addNote-name', function(e) {
+        if (localStorage.addNote_pageVer_name !== $('.addNote-name').val()) {
+            localStorage.addNote_pageVer_name = $('.addNote-name').val()
+        }
+    })
+    $(document).on('keyup', '.addNote-tag', function(e) {
+        if (localStorage.addNote_pageVer_tag !== $('.addNote-tag').val()) {
+            localStorage.addNote_pageVer_tag = $('.addNote-tag').val()
+        }
+    })
+
+    $(document).on('click', '.addNote-yesBtn', function() {
+        let name = $('.addNote-name').val()
+        let content = $('.addNote-content').val()
+        if (!name && !content) {
+            return alert('名称和标题不能都空白。')
+        }
+        let tag = $('.addNote-tag').val()
+        $('.addNote-yesBtn').attr('disabled', true)
+        var realData = {
+            name: escape(name),
+            content: escape(content),
+            tag: escape(tag)
+        }
+
+        var thisDom = $(this)
+        thisDom.html('添加中...')
+        thisDom.attr('disabled', 1)
+
+        var reqData = {itemData: escape(JSON.stringify(realData))}
+        ajax('addItem', reqData, function(d) {
+            $('.addNote-yesBtn').removeAttr('disabled')
+
+            $('.addNote-name').val('')
+            $('.addNote-content').val('')
+            $('.addNote-tag').val('')
+            localStorage.addNote_pageVer_content = ''
+            localStorage.addNote_pageVer_name = ''
+            localStorage.addNote_pageVer_tag = ''
+
+            $('.addNote-name').focus()
+            thisDom.removeAttr('disabled')
+            thisDom.html('添加')
+        }, () => {
+            thisDom.html('添加')
+            thisDom.removeAttr('disabled')
+        })
+    })
+
+    $(document).on('click', '*[data-search]', function() {
+        $('.findContent').val($(this).attr('data-search'))
+        search()
+        getSearchRes()
+        
+    })
+    $(document).on('click', '.moreItemsBtn', function() {
+        showNextItems()
+        $(this).remove()
+    })
+    $(document).on('click', '.showPageMsg', function() {
+        $(this).parent().parent().find('.pageTitle,.pageTag,.pageUrl').removeClass('hide')
+        $(this).hide()
+    })
+
+    // $('body').append('<div class="d9aevi2" style="color:red;font-weight:bold"></div>')
+    // setInterval(function() {
+    //     if ($('.qk-addItemBtn').length == 0) {
+    //         $('body .d9aevi2').html('你没有安装QuickNote Chrome拓展！')
+    //     }
+    // }, 1000)
+
+    $(document).on('click', '.qkweb-content .item .item2 .v img', function() {
+
+        showModal('checkImg', '看图模式', '<img src="' + $(this).attr('src') + '" alt="" style="height:90%">', '<button class="btn qkmodal-close">×</button>')
+    })
+
+    $(document).on('click', '.operItem', function() {
+        $(this).parent().parent().append('<div class="operItemModal czjz"><div class="btns"><button class="btn edit"><ion-icon name="create-outline"></ion-icon></button> <button class="btn remove"><ion-icon name="trash-outline"></ion-icon></button> <button class="btn copy"><ion-icon name="copy-outline"></ion-icon></button> <button class="btn close"><ion-icon name="close-outline"></ion-icon></button></div></div>')
+    })
+
+    $(document).on('click', '.operItemModal .close', function() {
+        $(this).parent().parent().remove()
+    })
+
+    var operItem = 0
+    $(document).on('click', '.operItemModal .btns .remove', function() {
+        operItem = $(this).parent().parent().parent()
+        showModal('isRemoveItem', '信息', '确定删除？', '<button class="btn oper no-1">确定</button><button class="btn qkmodal-close">取消</button>')
+        regModalOperEvent('isRemoveItem', 'button', 1, 'click', () => {
+            getModalOper('isRemoveItem', 'button', 1).attr('disabled', 1)
+            $(getModalOper('isRemoveItem', 'button', 1)).html('删除中...')
+            ajax('remove', {
+                id: Number(operItem.find(' .item2.id .v').html())
+            }, () => {
+                operItem.remove()
+                delete preLoadSearchRes[escape(nowShowSearch)]
+                closeModal('isRemoveItem')
+            }, () => {
+                getModalOper('isRemoveItem', 'button', 1).removeAttr('disabled')
+                $(getModalOper('isRemoveItem', 'button', 1)).html('删除')
+            })
+        })
+
+    })
+
+    $(document).on('click', '.operItemModal .btns .copy', function() {
+        operItem = $(this).parent().parent().parent().parent()
+        ajax('copy', {
+            id: Number(operItem.find(' .item2.id .v').html())
+        }, function(d, th) {
+            $('.findContent').val(d.id)
+            delete preLoadSearchRes[escape(nowShowSearch)]
+            getSearchRes()
+            search()
+        })
+    })
+
+    $(document).on('click', '.operItemModal .btns .edit', function() {
+        var operItem = $(this).parent().parent().parent(),
+            itemData = resData[resData_fromIdGetItemData[$(operItem).attr('data-id')]],
+            html = '',
+            no = 0,
+            noMap = {}
+
+        showModal('editItemEveryKAndV', '编辑', '', `
+        <button class="btn oper no-1">保存</button>
+        <button class="btn qkmodal-close">关闭</button>
+
+            `)
+
+
+        for (let k in itemData) {
+
+            if (k == 'tag') {
+                var inputOrTaVal = itemData[k].join(' ')
+            } else {
+                var inputOrTaVal = itemData[k]
+            }
+            
+            if (typeof inputOrTaVal !== 'string' && typeof inputOrTaVal !== 'number' ) {
+                continue;
+            }
+
+            if (k == 'time' || k == 'id' || k == 'type') {
+                continue;
+            }
+
+            noMap[no] = k
+
+            var html = `<div class="item"><div class="k"><div class="float">${k}</div></div>`
+
+            if (k == 'content') {
+                html += `<textarea rows="10" class="oper no-${no}" placeholder="空"></textarea>`
+            } else {
+                html += `<input type="text" class="oper no-${no}" placeholder="空" />`
+            }
+
+            html += '</div>'
+
+            $('.qkmodal-box[data-fun=editItemEveryKAndV] .qkmodal-body').append(html)
+
+            getModalOper('editItemEveryKAndV', (k == 'content' ? 'textarea':'input'), no).val(inputOrTaVal)
+
+            
+            no++
+
+        }
+
+        regModalOperEvent('editItemEveryKAndV', 'button', 1, 'click', (dom) => {
+            var wantChange = {},
+                changeCount = 0
+            for (let k in noMap) {
+                let newVal = getModalOper('editItemEveryKAndV', (noMap[k] == 'content' ? 'textarea':'input'), k).val()
+                if (noMap[k].indexOf('tag') >= 0) {
+                    var ifdy = itemData[noMap[k]].join(' ')
+                } else {
+                    var ifdy = itemData[noMap[k]]
+                }
+                if (newVal !== ifdy) {
+                    wantChange[noMap[k]] = escape(newVal)
+                    changeCount++
+                }
+            }
+            if (1) { //changeCount
+                wantChange.id = itemData.id
+                getModalOper('editItemEveryKAndV', 'button', 1).attr('disabled', 0)
+                getModalOper('editItemEveryKAndV', 'button', 1).html('saving...')
+                ajax('editItem', wantChange, function(d) {
+                    for (let k in wantChange) {
+                        if (k !== 'id' && k !== 'token') {
+                            if (k == 'tag') {
+                                itemData[k] = unescape(wantChange[k]).split(' ')
+                            } else {
+                                itemData[k] = unescape(wantChange[k])
+                            }
+                            search()
+                        }
+                    }
+                    getModalOper('editItemEveryKAndV', 'button', 1).removeAttr('disabled')
+                    getModalOper('editItemEveryKAndV', 'button', 1).html('保存')
+                })
+            } else {
+                alert('保存了个寂寞')
+            }
+
+        })
+
+
+        $(this).parent().parent().hide()
+    })
+
+    //数据备份
+    $('.tuijianbtn-data-backups').click(() => {
+        showModal('dataBackups', '数据备份和还原', `欢迎使用数据自动备份服务，您需要知道：<br>1.本服务最多保留最近100份不同版本<br>2.自动备份服务会在每天的4时执行一次备份操作<br>3.请根据需要自行下载版本数据。<div class="data-backups-box">
+    L o a d i n g ...
+</div>`, `
+        <button class="btn qkmodal-close">关闭</button>`)
+       $.ajax({
+            'type': 'GET',
+            'url': 'https://lbyun-img-003.nos-eastchina1.126.net/qk-data-backups/' + md5(parm) + '/backups.data',
+            'data': {},
+            'cache': false,
+            'dataType': 'html',
+            'async' : true,
+            success : function (d) {
+                d = JSON.parse(d)
+                console.log(d)
+                if (d.length > 0) {
+
+                } else {
+                    $('.qkmodal-box.dataBackups .data-backups-box').html('备份数据为空。')
+                }
+                // <div class="item">dadadads,50kb <a href="sss.cc">下载</a></div>
+            },
+            error: () => {
+                $('.qkmodal-box.dataBackups .data-backups-box').html('暂没有备份数据。')
+            }
+        });
+
+    })
+
+
+
+
+
+} )()
+
+
+
+
+
+
+
+</script>
+<div class="theme-lightblue" style="display:none">
+    html {
+        font-size: 18px;
+    }
+    body {
+        font-size: 1rem;
+        background-color: #d9f0ff;
+    }
+    button {
+        background-color: #71b7e6;
+        color: #fff;
+        outline: none;
+        font-size: 1rem;
+    }
+    .container {
+        position: relative;
+        max-width: 550px;
+        margin: 10px auto 10px auto;
+        /*border: 3px solid #71B7E6;*/
+        border-radius: 8px;
+    }
+    .addItemBtn {
+        position: absolute;
+        font-size: 1.6rem;
+        cursor: pointer;
+        top: 0;
+        bottom: 0;
+        right: -1.6rem;
+        outline: none;
+        border: none;
+        background-color: transparent;
+        color: #71b7e6;
+    }
+    .addItemBtn:active {
+        background-color: #71b7e6;
+        color: #fff
+    }
+    input,textarea {
+        background-color: #71b7e6;
+        border: none;
+        padding: 0.3rem 0;
+        outline: none;
+        border-radius: 0.6rem;
+        font-size: 1rem;
+    }
+    .findContent,
+    .findContent:focus {
+        width: 100%;
+        font-size: 1.6rem;
+        text-align: center;
+        overflow: hidden;
+    }
+    .qkweb-content {
+        max-width: 800px;
+        margin: 0 auto;
+
+    }
+    .qkweb-content .item {
+        position: relative;
+        background-color: #fff;
+        /*padding-top: 8px;*/
+        border: 2px solid #71b7e6;
+        margin-bottom: 0.95rem;
+        border-radius: 0.28rem;
+        min-height: 4.8rem;
+    }
+    .qkweb-content .item .editItemModal {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(255,255,255, .8);
+        text-align: center;
+    }
+    .qkweb-content .item .item2 .k {
+        background-color: #71B7E6;
+        /*border-radius: 4px;*/
+        color: #fff;
+        margin-right: 0.26rem;
+        /*padding: 4px;*/
+    }
+    .qkweb-content .item>.item2 {
+        width: 70%;
+    }
+    .qkweb-content .item .item2 .k,
+    .qkweb-content .item .item2 .v {
+        word-wrap:break-word;
+        word-break:normal;
+    }
+    .qkweb-content .item .item2.name .k,
+    .qkweb-content .item .item2.content .k {
+        display: none;
+    }
+    .qkweb-content .item .item2.content {
+        /*margin-bottom: 10px;*/
+        /*background-color: #eee*/
+    }
+
+    .qkweb-content .item .item2.name .v {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+    .qkweb-content .item .item2.name.noName .v {
+        color: #ddd;
+    }
+
+    .qkweb-content .item .item2.url .v {
+/*        overflow: hidden;
+        text-overflow:ellipsis;
+        white-space: nowrap;*/
+    }
+
+
+    a,.a {
+        color: #39C;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    a:hover,.a:hover {
+        color: #02A3FB;
+        text-decoration: underline;
+    }
+    a.tag {
+        margin-right: 0.4rem;
+    }
+    a.tag:hover {
+        color: #fff;
+        background-color: #39C;
+    }
+    .hide,.hide1 {
+        display: none;
+    }
+    .floatContainer {
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        right: -0.7rem;
+        z-index: 999;
+        width: 30%;
+        transition: .2s;
+        text-align: center;
+        background: #fff;
+        border-radius: 4px;
+    }
+    .qkweb-content .item:hover .floatContainer,
+    .qkweb-content .item .floatContainer:hover {
+        opacity: 1;
+    }
+    .floatContainer .k {
+        display: block;
+        background-color: #d9f0ff;
+        border-radius: 4px;
+    }
+
+    @media only screen and (max-width: 1200px) {
+        html {
+            font-size: 40px;
+            /*background-color: #000;*/
+        }
+        .container,
+        .qkweb-content {
+            max-width: 100%;
+        }
+    } 
+
+    ::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgb(0 0 0 / 30%);
+        border-radius: 10px;
+        background-color: #F5F5F5;
+
+    }
+    ::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        -webkit-box-shadow: inset 0 0 6px rgb(0 0 0 / 30%);
+        background-color: #018EE8;
+    }
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+        background-color: #F5F5F5;
+    }
+</div>
+</body>
+</html>
