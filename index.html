@@ -53,7 +53,7 @@
     .container-sm {
         position: relative;
         max-width: 550px;
-        margin: 10px auto 10px auto;
+        margin: 10px auto 0 auto;
         /*border: 3px solid #71B7E6;*/
         border-radius: 8px;
     }
@@ -120,12 +120,22 @@
 
     }
     .topSearchBar .tuijian {
+        position: relative;
         margin-top: .2rem;
         font-size: .7rem;
         text-align: center;
     }
-    .topSearchBar .tuijian a {
-        color: #999;
+    .topSearchBar .tuijian>a {
+        font-size: 1.4rem;
+        color: #000;
+    }
+    .topSearchBar .tuijian-show {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255,255,255,.8);
     }
     .topSearchBar>.container {
         /*box-shadow: 0 3px 12px rgb(98 107 181 / 25%);*/
@@ -140,7 +150,7 @@
         background-color: #fff;
         padding: .5rem;
         border: 1px solid #d0d0d0;
-        margin-bottom: 0.95rem;
+        margin-bottom: 0.5rem;
         border-radius: 0.28rem;
         min-height: 2.8rem;
         word-break : normal;
@@ -493,6 +503,13 @@
         border: 1px solid #222;
         padding: .5rem;
     }
+    .qkweb-content-welcome .h {
+        font-weight: normal;
+        font-size: 2rem
+    }
+    .disabled {
+        opacity: .3;
+    }
 </style>
 <body>
     <div class="topSearchBar">
@@ -501,18 +518,51 @@
                 <input type="text" class="findContent" placeholder="Start here!">
                 <button class="addItemBtn">+</button>
                 <div class="typing_loader loading-icon" style="display:none"></div>
-                <div class="tuijian" >
-                    <a href="javascript:;" data-search="#系统化#">系统化</a>&nbsp;&nbsp;
-                    <!-- <a href="javascript:;" data-search="#pixivImg#">#p站美图#</a> -->
-                    <a href="javascript:;" data-search="1">搜索全部</a>&nbsp;&nbsp;
-                    <a href="javascript:;" data-search="@回收站@">回收站</a>&nbsp;&nbsp;
-                    <a href="javascript:;" class="tuijianbtn-data-backups">数据备份</a>
+                <div class="tuijian">
+                    <a href="javascript:;" data-search="1"><ion-icon name="home-outline"></ion-icon></a>
+                    &nbsp;&nbsp;
+                    <a class="tag-islock disabled" href="javascript:;"><ion-icon name="lock-open-outline"></ion-icon></a>
+                    &nbsp;&nbsp;
+                    <a class="qkweb-content-back" href="javascript:;"><ion-icon name="chevron-back-outline"></ion-icon></a>
+                    &nbsp;
+                    <a class="qkweb-content-refresh" href="javascript:;"><ion-icon name="refresh-outline"></ion-icon></a>
+                    &nbsp;
+                    <a class="qkweb-content-forward" href="javascript:;"><ion-icon name="chevron-forward-outline"></ion-icon></a>
+                    &nbsp;&nbsp;
+                    <a class="backup tuijianbtn-data-backups" href="javascript:;"><ion-icon name="cloud-outline"></ion-icon></a>
+                    &nbsp;&nbsp;
+                    <a class="search-suggest" href="javascript:;"><ion-icon name="bulb-outline"></ion-icon></a>
+
+                    <div class="tuijian-show" style="display: none">
+                        <a href="javascript:;" data-search="#系统化#">系统化</a>&nbsp;&nbsp;
+                        <!-- <a href="javascript:;" data-search="#pixivImg#">#p站美图#</a> -->
+                        <a href="javascript:;" data-search="1">搜索全部</a>&nbsp;&nbsp;
+                        <a href="javascript:;" data-search="@回收站@">回收站</a>&nbsp;&nbsp;
+                        <a href="javascript:;" class="tuijianbtn-data-backups">数据备份</a>&nbsp;&nbsp;
+                        <a href="javascript:alert('请刷新页面找人生向导！');">我该咋办</a>&nbsp;&nbsp;
+                        <a href="javascript:;"><b>X</b></a>
+                    </div>
+
                 </div>
             </div>
         </div>
 
     </div>
-    <div class="qkweb-content container" style="margin-top: 5rem"></div>
+    <div class="qkweb-content container" style="margin-top: 5rem">
+        <div class="qkweb-content-welcome">
+            <p>
+                <div class="h">1.人生向导</div>
+                <a href="javascript:;" data-search="系统方法 问题法" class="i">做一个决定</a>
+                <a href="javascript:;" data-search="系统方法 问题法" class="i">做一个决定</a>
+                <br>
+                <a href="javascript:;" data-search="系统方法 人生法" class="i">心情不好</a>
+                <br>
+                <a href="javascript:;" data-search="系统方法 学习法" class="i">更有效率地学习</a>
+                <br>
+                <a href="javascript:;" data-search="系统方法 编程法" class="i">实现一个功能</a>
+            </p>
+        </div>
+    </div>
 <!--     <div class="qkmodal-box" style="display:none" data-id=0>
         <div class="qkmodal">
             <div class="qkmodal-head">
@@ -668,14 +718,19 @@
             all: 0,
             save: 0,
             percentage: 0
+        },
+        historySearchNotes = {
+            notes: [],
+            active: -1
         }
 
     //获取搜索结果并保存
-    var getSearchRes = () => {
+    var getSearchRes = (searchFun = function() {search()}) => {
         var preLoadSearchRes_key = escape($('.findContent').val())
         var beforeAjax_findContent = $('.findContent').val()
 
         if (beforeAjax_findContent == '') return
+        if (typeof preLoadSearchRes[preLoadSearchRes_key] == 'object') return
 
         ajax('search', {
             content: escape(beforeAjax_findContent)
@@ -695,22 +750,33 @@
             preLoadSearchRes[preLoadSearchRes_key] = d.data
 
             if (searchState == 'waitRes' && beforeAjax_findContent == $('.findContent').val()) {
-                search()
+                searchState = 'ready'
+                searchFun()
             }
         })
     }
 
     var searchState = 'normal',
         nowShowSearch = '';
-    function search(isPreSearch = false) {
+    function search(isForceSearch = false, historySearchNote = -1) {
+        if (historySearchNote !== -1) {
+            $('.findContent').val(historySearchNotes.notes[historySearchNote])
+            historySearchNotes.active = historySearchNote
+        } else {
+            historySearchNotes.notes.push($('.findContent').val())
+            historySearchNotes.active = historySearchNotes.notes.length - 1
+        }
+
         var preLoadSearchRes_key = escape($('.findContent').val())
 
-        if ($('.findContent').val() == '' || nowShowSearch == $('.findContent').val()) return
+        if ($('.findContent').val() == '' ) return
+
+        if (!isForceSearch && nowShowSearch == $('.findContent').val()) return
 
         // $('.qkweb-content').html('查询中...')
         $('.loading-icon').fadeIn(100)
 
-        if (typeof preLoadSearchRes[preLoadSearchRes_key] !== 'undefined') {
+        if (typeof preLoadSearchRes[preLoadSearchRes_key] !== 'undefined' && searchState !== 'waitRes') {
             resData = preLoadSearchRes[preLoadSearchRes_key]
 
             $('.loading-icon').fadeOut(100)
@@ -737,6 +803,7 @@
             }
 
         } else {
+            console.log(preLoadSearchRes)
             searchState = 'waitRes'
         }
     }
@@ -757,13 +824,13 @@
         preLoad_beforeFindContent = $('.findContent').val()
     })
 
-    $(document).on('mouseup', '*', function(e) {
-        //实时预读内容
-        if (preLoad_beforeFindContent !== $('.findContent').val()) {
-            getSearchRes()
-        }
-        preLoad_beforeFindContent = $('.findContent').val()
-    })
+    // $(document).on('mouseup', '*', function(e) {
+    //     //实时预读内容
+    //     if (preLoad_beforeFindContent !== $('.findContent').val()) {
+    //         getSearchRes()
+    //     }
+    //     preLoad_beforeFindContent = $('.findContent').val()
+    // })
 
 
 
@@ -818,6 +885,18 @@
 
     }
 
+    function htmlToText(h) {
+        h = h.replace(/</g, '&lt;')
+        h = h.replace(/>/g, '&gt;')
+        h = h.replace(/"/g, '&quot;')
+        h = h.replace(/'/g, '&lsquo;')
+        h = h.replace(/ /g, '&nbsp;')
+        h = h.replace(/\n/g, '<br>')
+        h = h.replace(/\//g, '&#47;')
+        h = h.replace(/\\/g, '&#92;')
+        return h
+    }
+
     var nowShowItemsStart = 0
     function showNextItems() {
         for (var i = nowShowItemsStart; i < nowShowItemsStart + 9; i++) {
@@ -856,12 +935,12 @@
                     if (typeof resData[i].isCodeMode !== 'undefined') {
                         var v = resData[i][k]
                     } else {
-                        var v = resData[i][k].replace(/\n/g, '<br>').replace(/ /g, '&nbsp;')
+                        var v = htmlToText(resData[i][k])
                         v = richItemContent(v)
                     }
                 } else {
                     if (typeof resData[i][k] == 'string') {
-                        var v = resData[i][k].replace(/\n/g, '<br>').replace(/ /g, '&nbsp;')
+                        var v = htmlToText(resData[i][k])
                     } else {
                         var v = resData[i][k]
                     }
@@ -1272,6 +1351,33 @@
         });
 
     })
+
+
+    $('.tuijian>a.qkweb-content-refresh').click(() => {
+        if (typeof preLoadSearchRes[escape($('.findContent').val())] == 'object') {
+            delete preLoadSearchRes[escape($('.findContent').val())]
+        }
+        
+        searchState = 'waitRes'
+        getSearchRes(() => {
+            search(true)
+        })
+    })
+
+    $('.tuijian>a.qkweb-content-back').click(() => {
+        historySearchNotes.active--
+        search(false, historySearchNotes.active)
+        console.log(historySearchNotes)
+    })
+    
+
+    $('.tuijian>a.search-suggest').click(() => {
+        $('.tuijian .tuijian-show').fadeIn(200)
+    })
+    $('.tuijian .tuijian-show a').click(() => {
+        $('.tuijian .tuijian-show').fadeOut(200)
+    })
+
 
 
 
